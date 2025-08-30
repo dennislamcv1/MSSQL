@@ -1,0 +1,8 @@
+-- Indexes for FactSales
+CREATE INDEX IDX_FactSales_DateKey ON dbo.FactSales(DateKey);
+CREATE INDEX IDX_FactSales_CustomerKey ON dbo.FactSales(CustomerKey);
+CREATE INDEX IDX_FactSales_ProductKey ON dbo.FactSales(ProductKey);
+
+-- Indexes for FactHealthMetrics
+CREATE INDEX IDX_FactHealthMetrics_DateKey ON dbo.FactHealthMetrics(DateKey);
+CREATE INDEX IDX_FactHealthMetrics_CustomerKey ON dbo.FactHealthMetrics(CustomerKey);

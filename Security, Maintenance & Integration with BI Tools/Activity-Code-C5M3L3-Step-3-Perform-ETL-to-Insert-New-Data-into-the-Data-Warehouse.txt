@@ -1,0 +1,112 @@
+-- ==========================================
+-- TechHealthDW ETL Script for New Records
+-- Inserts: DimDate, DimCustomer, DimDevice, FactHealthMetrics, FactSales
+-- ==========================================
+
+-- Step 1: Insert into DimDate
+INSERT INTO [dbo].[DimDate] (DateKey, Date, Year, Quarter, Month, Day, WeekdayName)
+SELECT DISTINCT
+    CONVERT(INT, FORMAT(d, 'yyyyMMdd')) AS DateKey,
+    d AS Date,
+    YEAR(d),
+    DATEPART(QUARTER, d),
+    MONTH(d),
+    DAY(d),
+    DATENAME(WEEKDAY, d)
+FROM (
+    SELECT purchase_date AS d FROM TechHealthDb.dbo.Devices
+    UNION
+    SELECT last_sync_date FROM TechHealthDb.dbo.Devices
+    UNION
+    SELECT sale_date FROM TechHealthDb.dbo.Sales
+    UNION
+    SELECT month_date FROM TechHealthDb.dbo.HealthMetrics
+) AS AllDates
+WHERE CONVERT(INT, FORMAT(d, 'yyyyMMdd')) NOT IN (
+    SELECT DateKey FROM [dbo].[DimDate]
+);
+GO
+SELECT * FROM [dbo].[DimDate];
+GO
+
+-- Step 2: Insert into DimCustomer
+INSERT INTO [dbo].[DimCustomer] (CustomerKey, UserID, Age, Gender, Occupation, IncomeBracket, SubscriptionType, City, State, Country)
+SELECT
+    c.user_id, c.user_id, c.age, c.gender, c.occupation, c.income_bracket,
+    c.subscription_type, g.city, g.state, g.country
+FROM TechHealthDb.dbo.Customers c
+JOIN TechHealthDb.dbo.GeoLocation g ON c.location_id = g.location_id
+WHERE NOT EXISTS (
+    SELECT 1 FROM [dbo].[DimCustomer] dc WHERE dc.UserID = c.user_id
+);
+GO
+
+SELECT * FROM [dbo].[DimCustomer] WHERE UserID IN ('TH054', 'TH055', 'TH056');
+GO
+
+-- Step 3: Insert into DimDevice
+INSERT INTO [dbo].[DimDevice] (
+    DeviceID, DeviceType, FirmwareVersion, BatteryLifeDays,
+    SyncFrequencyDaily, ActiveHoursDaily, SleepTrackingEnabled,
+    HeartRateMonitoringEnabled, GPSEnabled, NotificationEnabled, DeviceStatus
+)
+SELECT
+    d.device_id, d.device_type, d.firmware_version, d.battery_life_days,
+    d.sync_frequency_daily, d.active_hours_daily, d.sleep_tracking_enabled,
+    d.heart_rate_monitoring_enabled, d.gps_enabled, d.notification_enabled, d.device_status
+FROM TechHealthDb.dbo.Devices d
+WHERE NOT EXISTS (
+    SELECT 1 FROM [dbo].[DimDevice] dd WHERE dd.DeviceID = d.device_id
+);
+GO
+
+SELECT * FROM [dbo].[DimDevice];
+GO
+
+
+-- Step 4: Insert into FactHealthMetrics
+INSERT INTO [dbo].[FactHealthMetrics] (
+    RecordID, CustomerKey, DateKey, AvgHeartRate, AvgRestingHeartRate,
+    AvgDailySteps, AvgSleepHours, AvgDeepSleepHours, AvgDailyCalories,
+    AvgExerciseMinutes, AvgStressLevel, AvgBloodOxygen, TotalActiveDays,
+    WorkoutFrequency, AchievementRate
+)
+SELECT
+    hm.record_id,
+    dc.CustomerKey,
+    CONVERT(INT, FORMAT(hm.month_date, 'yyyyMMdd')) AS DateKey,
+    hm.avg_heart_rate, hm.avg_resting_heart_rate, hm.avg_daily_steps,
+    hm.avg_sleep_hours, hm.avg_deep_sleep_hours, hm.avg_daily_calories,
+    hm.avg_exercise_minutes, hm.avg_stress_level, hm.avg_blood_oxygen,
+    hm.total_active_days, hm.workout_frequency, hm.achievement_rate
+FROM TechHealthDb.dbo.HealthMetrics hm
+JOIN DimCustomer dc ON hm.user_id = dc.UserID
+WHERE NOT EXISTS (
+    SELECT 1 FROM [dbo].[FactHealthMetrics] fm WHERE fm.RecordID = hm.record_id
+);
+GO
+SELECT * FROM [dbo].[FactHealthMetrics];
+GO
+
+-- Step 5: Insert into FactSales
+INSERT INTO [dbo].[FactSales] (
+    SaleID, CustomerKey, ProductKey, DateKey, UnitPrice, Quantity, DiscountApplied,
+    TotalAmount, PaymentMethod, SubscriptionPlan, SalesChannel, Region, SalesRepID
+)
+SELECT
+    s.sale_id,
+    dc.CustomerKey,
+    dp.ProductKey,
+    CONVERT(INT, FORMAT(s.sale_date, 'yyyyMMdd')) AS DateKey,
+    s.unit_price, s.quantity, s.discount_applied,
+    s.total_amount, s.payment_method, s.subscription_plan,
+    s.sales_channel, s.region, s.sales_rep_id
+FROM TechHealthDb.dbo.Sales s
+JOIN DimCustomer dc ON s.user_id = dc.UserID
+JOIN DimProduct dp ON s.product_id = dp.ProductID
+WHERE NOT EXISTS (
+    SELECT 1 FROM [dbo].[FactSales] fs WHERE fs.SaleID = s.sale_id
+);
+GO
+SELECT * FROM [dbo].[FactSales];
+GO

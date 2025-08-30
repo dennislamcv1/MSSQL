@@ -1,0 +1,8 @@
+- Create the TechHealthDW database
+CREATE DATABASE TechHealthDW;
+GO
+
+-- Use the newly created database
+USE TechHealthDW;
+GO
+

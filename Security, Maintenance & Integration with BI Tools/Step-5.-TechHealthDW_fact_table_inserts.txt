@@ -1,0 +1,71 @@
+-- Next, populate the fact tables.
+-- Populate FactHealthMetrics
+INSERT INTO [dbo].[FactHealthMetrics] (
+    RecordID, CustomerKey, DateKey,
+    AvgHeartRate, AvgRestingHeartRate, AvgDailySteps, AvgSleepHours, AvgDeepSleepHours,
+    AvgDailyCalories, AvgExerciseMinutes, AvgStressLevel, AvgBloodOxygen,
+    TotalActiveDays, WorkoutFrequency, AchievementRate
+)
+SELECT
+    hm.record_id,
+    dcu.CustomerKey,
+    CONVERT(INT, FORMAT(hm.month_date, 'yyyyMMdd')) AS DateKey,
+    hm.avg_heart_rate,
+    hm.avg_resting_heart_rate,
+    hm.avg_daily_steps,
+    hm.avg_sleep_hours,
+    hm.avg_deep_sleep_hours,
+    hm.avg_daily_calories,
+    hm.avg_exercise_minutes,
+    hm.avg_stress_level,
+    hm.avg_blood_oxygen,
+    hm.total_active_days,
+    hm.workout_frequency,
+    hm.achievement_rate
+FROM TechHealthDb.dbo.HealthMetrics hm
+JOIN [dbo].[DimCustomer] dcu ON hm.user_id = dcu.UserID;
+GO
+
+-- Populate FactSales
+INSERT INTO [dbo].[FactSales] (
+    SaleID, CustomerKey, ProductKey, DateKey,
+    UnitPrice, Quantity, DiscountApplied, TotalAmount,
+    PaymentMethod, SubscriptionPlan, SalesChannel,
+    Region, SalesRepID
+)
+SELECT
+    s.sale_id,
+    dc.CustomerKey,
+    dp.ProductKey,
+    CONVERT(INT, FORMAT(s.sale_date, 'yyyyMMdd')) AS DateKey,
+    s.unit_price,
+    s.quantity,
+    s.discount_applied,
+    s.total_amount,
+    s.payment_method,
+    s.subscription_plan,
+    s.sales_channel,
+    s.region,
+    s.sales_rep_id
+FROM TechHealthDb.dbo.Sales s
+JOIN [dbo].[DimCustomer] dc ON s.user_id = dc.UserID
+JOIN [dbo].[DimProduct] dp ON s.product_id = dp.ProductID;
+GO
+
+-- Populate FactServiceTickets
+INSERT INTO [dbo].[FactServiceTickets] (
+    TicketID, CustomerKey, DeviceKey, DateKey,
+    TicketStatus, ResolutionDate, IssueDescription
+)
+SELECT
+    t.ticket_id,
+    dc.CustomerKey,
+    dd.DeviceKey,
+    CONVERT(INT, FORMAT(t.creation_date, 'yyyyMMdd')) AS DateKey,
+    t.ticket_status,
+    t.resolution_date,
+    t.issue_description
+FROM TechHealthDb.dbo.Service_Tickets t
+LEFT JOIN [dbo].[DimCustomer] dc ON t.user_id = dc.UserID
+LEFT JOIN [dbo].[DimDevice] dd ON t.device_id = dd.DeviceID;
+GO

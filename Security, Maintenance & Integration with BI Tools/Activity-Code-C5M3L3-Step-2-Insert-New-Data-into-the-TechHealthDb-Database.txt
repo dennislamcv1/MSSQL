@@ -1,0 +1,73 @@
+-- Step 1. 
+-- Inserting new customer records into the Customers table.
+INSERT INTO [dbo].[Customers] (
+    user_id, age, gender, occupation, income_bracket,
+    registration_date, subscription_type, location_id
+)
+VALUES
+('TH054', 25, 'F', 'Applications Engineer', '50K-75K', GETDATE(), 'Basic', 4),
+('TH055', 30, 'M', 'Data Analyst', '75K-100K', GETDATE(), 'Premium', 12),
+('TH056', 36, 'F', 'Biomedical Engineer', '100K-150K', GETDATE(), 'Enterprise', 17);
+GO
+
+-- Verify the insert. 
+SELECT * FROM [dbo].[Customers];
+GO
+
+
+-- Step 2. 
+-- Insert new devices for the new customers
+INSERT INTO [dbo].[Devices] (
+    device_id, user_id, device_type, purchase_date, last_sync_date, firmware_version, battery_life_days,
+    sync_frequency_daily, active_hours_daily, total_steps_recorded, total_workouts_recorded, sleep_tracking_enabled,
+    heart_rate_monitoring_enabled, gps_enabled, notification_enabled, device_status
+)
+VALUES
+('DEV052', 'TH054', 'HealthTrack Lite', '2025-07-18', GETDATE(),'v3.2.5', 8.0, 12, 6.5, 21500, 14, 1, 1, 1, 1, 'Active'),
+('DEV053', 'TH055', 'HealthTrack Pro', '2025-07-18', GETDATE(),'v3.2.5', 10.0, 24, 10.0, 29500, 16, 1, 1, 1, 1, 'Active'),
+('DEV054', 'TH056', 'HealthTrack Elite', '2025-07-18', GETDATE(),'v3.2.5', 12.0, 24, 14.0, 32200, 20, 1, 1, 1, 0, 'Active');
+GO
+-- Verify the insertion of new devices
+SELECT * FROM [dbo].[Devices];
+GO
+
+-- Step 3. 
+-- Insert new health metrics for the new customers
+INSERT INTO [dbo].[HealthMetrics] (
+    record_id, user_id, month_date, avg_heart_rate, avg_resting_heart_rate,
+    avg_daily_steps, avg_sleep_hours, avg_deep_sleep_hours, avg_daily_calories,
+    avg_exercise_minutes, avg_stress_level, avg_blood_oxygen, total_active_days,
+    workout_frequency, achievement_rate
+)
+VALUES
+('MHM054', 'TH054', '2025-07-18', 68, 58, 6540, 7.0, 2.5, 2115, 45, 3.4, 97.2, 3, 3, 0.92),
+('MHM055', 'TH055', '2025-07-18', 82, 67, 10978, 6.5, 2.2, 2455, 50, 4.2, 98.0, 4, 4, 0.85),
+('MHM056', 'TH056', '2025-07-18', 76, 63, 12510, 7.8, 2.8, 2250, 55, 3.0, 97.5, 5, 5, 0.95);
+GO
+
+-- Verify the inserted records
+SELECT * FROM [dbo].[HealthMetrics];
+GO
+
+-- Step 4. 
+-- Insert new sales records for the new customers
+INSERT INTO [dbo].[Sales] (
+    sale_id, user_id, sale_date, product_id, unit_price,
+    quantity, discount_applied, total_amount, payment_method,
+    subscription_plan, sales_channel, region, sales_rep_id
+)
+VALUES
+('S062', 'TH054', '2025-07-18', 'LIT-001', 199.99, 1, 5.00, 189.99, 'Credit Card', 'Basic', 'Online', 'South', 'REP004'),
+('S063', 'TH054', '2025-07-18', 'SUB-002', 9.99, 12, 0.00, 119.88, 'Credit Card', 'Basic', 'Online', 'South', 'REP004'),
+('S064', 'TH054', '2025-07-18', 'ACC-002', 39.99, 1, 5.00, 37.99, 'Credit Card', 'Basic', 'Online', 'South', 'REP004'),
+('S065', 'TH055', '2025-07-18', 'PRO-001', 299.99, 1, 10.00, 269.99, 'PayPal', 'Premium', 'Online', 'West', 'REP003'),
+('S066', 'TH055', '2025-07-18', 'SUB-001', 14.99, 12, 10.00, 161.89, 'PayPal', 'Premium', 'Online', 'West', 'REP003'),
+('S067', 'TH055', '2025-07-18', 'ACC-002', 39.99, 1, 10.00, 35.99, 'PayPal', 'Premium', 'Online', 'West', 'REP003'),
+('S068', 'TH056', '2025-07-18', 'ELT-001', 499.99, 1, 15.00, 424.99, 'Credit Card', 'Enterprise', 'Retail', 'South', 'REP004'),
+('S069', 'TH056', '2025-07-18', 'SUB-003', 24.99, 12, 15.00, 254.99, 'Credit Card', 'Enterprise', 'Retail', 'South', 'REP004'),
+('S070', 'TH056', '2025-07-18', 'ACC-001', 49.99, 1, 15.00, 33.99, 'Credit Card', 'Enterprise', 'Retail', 'South', 'REP004');
+GO
+
+-- Verify the inserted records
+SELECT * FROM [dbo].[Sales];
+GO

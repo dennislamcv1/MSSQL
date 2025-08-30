@@ -1,0 +1,92 @@
+-- First, populate the dimension tables
+-- Populate DimDate
+INSERT INTO [dbo].[DimDate] (
+    DateKey, Date, Day, Month, Year, Quarter, WeekdayName
+)
+SELECT DISTINCT 
+    CONVERT(INT, FORMAT(d, 'yyyyMMdd')) AS DateKey,
+    d AS Date,
+    DAY(d),
+    MONTH(d),
+    YEAR(d),
+    DATEPART(QUARTER, d),
+    DATENAME(WEEKDAY, d)
+FROM (
+    SELECT month_date AS d FROM TechHealthDb.dbo.HealthMetrics WHERE month_date IS NOT NULL
+    UNION
+    SELECT sale_date FROM TechHealthDb.dbo.Sales WHERE sale_date IS NOT NULL
+    UNION
+    SELECT last_sync_date FROM TechHealthDb.dbo.Devices WHERE last_sync_date IS NOT NULL
+    UNION
+    SELECT purchase_date FROM TechHealthDb.dbo.Devices WHERE purchase_date IS NOT NULL
+) AS AllDates
+WHERE CONVERT(INT, FORMAT(d, 'yyyyMMdd')) 
+      NOT IN (SELECT DateKey FROM [dbo].[DimDate]);
+GO
+
+-- Populate DimCustomer
+INSERT INTO [dbo].[DimCustomer] (
+    UserID, Age, Gender, Occupation, IncomeBracket, SubscriptionType, City, State, Country
+)
+SELECT
+    c.user_id,
+    c.age,
+    c.gender,
+    c.occupation,
+    c.income_bracket,
+    c.subscription_type,
+    g.city,
+    g.state,
+    g.country
+FROM TechHealthDb.dbo.Customers c
+LEFT JOIN TechHealthDb.dbo.GeoLocation g ON c.location_id = g.location_id;
+GO
+
+-- Populate DimProduct
+INSERT INTO [dbo].[DimProduct] (
+    ProductID, ProductName, ProductCategory
+)
+SELECT
+    product_id,
+    product_name,
+    product_category
+FROM TechHealthDb.dbo.Products;
+GO
+
+-- Populate DimCoach
+INSERT INTO [dbo].[DimCoach] (
+    CoachID, FirstName, LastName, Specialization, ExperienceYears, Certification, Region, ContactEmail
+)
+SELECT
+    coach_id,
+    first_name,
+    last_name,
+    specialization,
+    experience_years,
+    certification,
+    region,
+    contact_email
+FROM TechHealthDb.dbo.Coaches;
+GO
+
+
+-- Populate DimDevice
+INSERT INTO [dbo].[DimDevice] (
+    DeviceID, DeviceType, FirmwareVersion, BatteryLifeDays,
+    SyncFrequencyDaily, ActiveHoursDaily, SleepTrackingEnabled,
+    HeartRateMonitoringEnabled, GPSEnabled, NotificationEnabled, DeviceStatus
+)
+SELECT
+    device_id,
+    device_type,
+    firmware_version,
+    battery_life_days,
+    sync_frequency_daily,
+    active_hours_daily,
+    sleep_tracking_enabled,
+    heart_rate_monitoring_enabled,
+    gps_enabled,
+    notification_enabled,
+    device_status
+FROM TechHealthDb.dbo.Devices;
+GO

@@ -1,0 +1,36 @@
+-- Insert into FactOrders
+INSERT INTO [dbo].[FactOrders] (OrderID, CustomerKey, DateKey, TotalAmount)
+SELECT
+    o.order_id,
+    dc.CustomerKey,
+    CONVERT(INT, FORMAT(o.order_date, 'yyyyMMdd')) AS DateKey,
+    o.total_amount
+FROM DiscountTech.dbo.Orders o
+JOIN [dbo].[DimCustomer] dc ON o.customer_id = dc.CustomerID;
+GO
+
+-- Insert into FactOrderItems
+INSERT INTO [dbo].[FactOrderItems] (OrderID, ProductKey, Quantity)
+SELECT
+    oi.order_id,
+    dp.ProductKey,
+    oi.quantity
+FROM DiscountTech.dbo.OrderItems oi
+JOIN [dbo].[DimProduct] dp ON oi.product_id = dp.ProductID;
+GO
+
+-- Insert into FactReturns
+INSERT INTO [dbo].[FactReturns] (
+    ReturnID, OrderID, ProductKey, CustomerKey, ReturnReason, DateKey, RefundAmount)
+SELECT
+    r.return_id,
+    r.order_id,
+    dp.ProductKey,
+    dc.CustomerKey,
+    r.return_reason,
+    CONVERT(INT, FORMAT(r.return_date, 'yyyyMMdd')) AS DateKey,
+    r.refund_amount
+FROM DiscountTech.dbo.Returns r
+LEFT JOIN [dbo].[DimProduct] dp ON r.product_id = dp.ProductID
+LEFT JOIN [dbo].[DimCustomer] dc ON r.customer_id = dc.CustomerID;
+GO

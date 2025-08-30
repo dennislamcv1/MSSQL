@@ -1,0 +1,2 @@
+stage_device_id,user_id,device_type,purchase_date,firmware_version,battery_life_days,sync_frequency_daily,active_hours_daily,total_steps_recorded,total_workouts_recorded,sleep_tracking_enabled,heart_rate_monitoring_enabled,gps_enabled,notification_enabled,device_status
+102,TH058,HealthTrack Elite,2025-08-03,v3.2.5,6.0,12,0.0,0,0,1,1,1,1,Active

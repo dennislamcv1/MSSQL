@@ -1,0 +1,74 @@
+CREATE DATABASE DiscountTechDW;
+GO
+
+USE DiscountTechDW;
+GO
+
+-- Dimension: Customer
+CREATE TABLE [dbo].[DimCustomer] (
+    CustomerKey INT IDENTITY(1,1) PRIMARY KEY,
+    CustomerID INT NOT NULL,
+    FirstName NVARCHAR(50),
+    LastName NVARCHAR(50),
+    Email NVARCHAR(100)
+);
+GO
+
+-- Dimension: Product
+CREATE TABLE [dbo].[DimProduct] (
+    ProductKey INT IDENTITY(1,1) PRIMARY KEY,
+    ProductID INT NOT NULL,
+    ProductName NVARCHAR(100),
+    Price DECIMAL(10,2)
+);
+GO
+
+-- Dimension: Date
+CREATE TABLE [dbo].[DimDate](
+    DateKey INT PRIMARY KEY, -- Format: YYYYMMDD
+    Date DATE NOT NULL,
+    Year INT NOT NULL,
+    Quarter INT NOT NULL,
+    Month INT NOT NULL,
+    Day INT NOT NULL,
+    WeekdayName NVARCHAR(10) NOT NULL
+);
+GO
+
+-- Fact: Orders
+CREATE TABLE [dbo].FactOrders (
+    OrderKey INT IDENTITY(1,1) PRIMARY KEY,
+    OrderID INT NOT NULL,
+    CustomerKey INT,
+    DateKey INT,
+    TotalAmount DECIMAL(10,2),
+    FOREIGN KEY (CustomerKey) REFERENCES [dbo].[DimCustomer](CustomerKey),
+    FOREIGN KEY (DateKey) REFERENCES [dbo].[DimDate](DateKey)
+);
+GO
+
+-- Fact: OrderItems
+CREATE TABLE [dbo].[FactOrderItems] (
+    ItemKey INT IDENTITY(1,1) PRIMARY KEY,
+    OrderID INT NOT NULL,
+    ProductKey INT,
+    Quantity INT,
+    FOREIGN KEY (ProductKey) REFERENCES [dbo].[DimProduct](ProductKey)
+);
+GO
+
+-- Fact: Returns
+CREATE TABLE [dbo].[FactReturns] (
+    ReturnKey INT IDENTITY(1,1) PRIMARY KEY,
+    ReturnID INT NOT NULL,
+    OrderID INT,
+    ProductKey INT,
+    CustomerKey INT,
+    ReturnReason NVARCHAR(100),
+    DateKey INT,
+    RefundAmount DECIMAL(10,2),
+    FOREIGN KEY (ProductKey) REFERENCES [dbo].[DimProduct](ProductKey),
+    FOREIGN KEY (CustomerKey) REFERENCES [dbo].[DimCustomer](CustomerKey),
+    FOREIGN KEY (DateKey) REFERENCES [dbo].[DimDate](DateKey)
+);
+GO

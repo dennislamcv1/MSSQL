@@ -1,0 +1,6 @@
+﻿order_id,product_id,customer_id,quantity,order_date,total_amount
+5,101,8,1,Aug 13 2025,799
+6,106,3,1,Aug 13 2025,299
+7,102,1,1,Aug 18 2025,1099
+8,103,4,2,Aug 21 2025,1998
+9,102,9,1,Aug 21 2025,999

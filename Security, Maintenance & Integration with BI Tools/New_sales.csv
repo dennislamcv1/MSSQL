@@ -1,0 +1,4 @@
+﻿stage_sale_id,sale_date,product_id,price,quantity,discount,total_amount,payment_type,subscription,sale_type,region,sales_rep
+103,Aug 03 2025,ELT-001,499.99,one,10%,449.99,CC,Enterprise,Direct Sales,TN,004
+104,Aug 03 2025,SUB-003,24.99,12 months,15%,254.9,CC,Enterprise,Direct Sales,TN,004
+105,Aug 03 2025,ACC-002,39.99,1,10%,35.99,CC,Enterprise,Direct Sales,TN,004
